@@ -1,5 +1,6 @@
 import {
   batch,
+  createEffect,
   createMemo,
   createSignal,
   For,
@@ -66,11 +67,11 @@ export interface CellRenderContext<T> {
   /** Enter editing mode for this cell */
   beginEdit: () => void;
 
-  /** Set the value of this cell */
-  setValue: (value: T) => void;
+  /** Commit edit with new value */
+  commitEdit: (value: T) => void;
 
   /** Exit editing mode for this cell */
-  stopEditing: () => void;
+  cancelEditing: () => void;
 }
 
 export interface GridsheetProps<T> {
@@ -186,10 +187,6 @@ export function Gridsheet<T>(props: GridsheetProps<T>): JSX.Element {
     return isEditing() && isCellActive(pos);
   };
 
-  const handleFocusOnCell = (pos: CellPosition) => {
-    setActiveCell(pos);
-  };
-
   const beginCellEdit = (pos: CellPosition) => {
     batch(() => {
       setIsEditing(true);
@@ -198,7 +195,7 @@ export function Gridsheet<T>(props: GridsheetProps<T>): JSX.Element {
     });
   };
 
-  const setCellValue = (pos: CellPosition, value: T) => {
+  const commitCellEdit = (pos: CellPosition, value: T) => {
     const nextData = props.data.map((row) => row.slice());
 
     const targetRow = nextData[pos.row];
@@ -208,9 +205,11 @@ export function Gridsheet<T>(props: GridsheetProps<T>): JSX.Element {
         props.onDataChange(nextData);
       }
     }
+
+    setIsEditing(false);
   };
 
-  const stopCellEdit = () => {
+  const cancelCellEdit = () => {
     setIsEditing(false);
   };
 
@@ -234,6 +233,9 @@ export function Gridsheet<T>(props: GridsheetProps<T>): JSX.Element {
   });
 
   const handleMouseDownOnCell = (pos: CellPosition) => {
+    // 編集中のセルは選択操作を無効化し、編集状態を維持する
+    if (isCellEditing(pos)) return;
+
     batch(() => {
       setIsMouseDown(true);
       setSelectionMode("cell");
@@ -325,9 +327,74 @@ export function Gridsheet<T>(props: GridsheetProps<T>): JSX.Element {
     });
   };
 
+  const moveActionCell = (deltaRow: number, deltaCol: number) => {
+    const ac = activeCell();
+    if (!ac) return;
+
+    const nextRow = Math.max(0, Math.min(numRows() - 1, ac.row + deltaRow));
+    const nextCol = Math.max(0, Math.min(numCols() - 1, ac.col + deltaCol));
+    const nextPos = { row: nextRow, col: nextCol };
+
+    setActiveCell(nextPos);
+    setSelection(normalizeRange(nextPos, nextPos));
+  };
+
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.isComposing) return;
+
+    // 編集中のキー操作はrenderCell側で処理する
+    if (isEditing()) return;
+
+    const ac = activeCell();
+    if (!ac) return;
+
+    switch (e.key) {
+      case "ArrowUp":
+        e.preventDefault();
+        moveActionCell(-1, 0);
+        break;
+      case "ArrowDown":
+        e.preventDefault();
+        moveActionCell(1, 0);
+        break;
+      case "ArrowLeft":
+        e.preventDefault();
+        moveActionCell(0, -1);
+        break;
+      case "ArrowRight":
+        e.preventDefault();
+        moveActionCell(0, 1);
+        break;
+      case "Tab":
+        e.preventDefault();
+        moveActionCell(0, e.shiftKey ? -1 : 1);
+        break;
+      case "Enter":
+        e.preventDefault();
+        beginCellEdit(ac);
+        break;
+
+      default:
+        break;
+    }
+  };
+
+  const cellRefs = new Map<string, HTMLElement>();
+  const getCellKey = (pos: CellPosition) => `${pos.row}:${pos.col}`;
+  createEffect(() => {
+    if (isEditing()) return;
+    const ac = activeCell();
+    if (ac) {
+      const el = cellRefs.get(getCellKey(ac));
+      el?.focus();
+    }
+  });
+
   return (
     <table
       data-slot="gridsheet"
+      tabIndex={-1}
+      onKeyDown={handleKeyDown}
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -387,14 +454,19 @@ export function Gridsheet<T>(props: GridsheetProps<T>): JSX.Element {
                       col: colIndex(),
                     })}
                     beginEdit={beginCellEdit}
-                    update={setCellValue}
-                    stopEditing={stopCellEdit}
+                    commitEdit={commitCellEdit}
+                    cancelEditing={cancelCellEdit}
                     setActiveCell={setActiveCell}
                     setSelection={setSelection}
                     renderCell={props.renderCell}
                     onMouseDown={handleMouseDownOnCell}
                     onMouseOver={handleMouseOverOnCell}
-                    onFocus={handleFocusOnCell}
+                    registerCellRef={(rowPos, colPos, el) => {
+                      cellRefs.set(
+                        getCellKey({ row: rowPos, col: colPos }),
+                        el,
+                      );
+                    }}
                   />
                 )}
               </For>
@@ -416,9 +488,13 @@ interface RowHeaderProps {
   class?: string | ((ctx: { rowIndex: number; isSelected: boolean }) => string);
 }
 
+function getRowLabel(rowIndex: number): string {
+  return `${rowIndex + 1}`;
+}
+
 function RowHeader(props: RowHeaderProps) {
   return (
-    // biome-ignore lint/a11y/useKeyWithMouseEvents: キーボード操作は未対応
+    // biome-ignore lint/a11y/useKeyWithMouseEvents: 親のtableでキー操作を処理している
     <th
       data-slot="gridsheet-rowheader"
       onMouseDown={() => props.onMouseDown(props.index)}
@@ -430,7 +506,7 @@ function RowHeader(props: RowHeaderProps) {
       }
       data-selected={props.isSelected || undefined}
     >
-      {props.index + 1}
+      {getRowLabel(props.index)}
     </th>
   );
 }
@@ -445,9 +521,21 @@ interface ColHeaderProps {
   class?: string | ((ctx: { colIndex: number; isSelected: boolean }) => string);
 }
 
+const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+function getColLabel(colIndex: number): string {
+  let label = "";
+  let n = colIndex + 1;
+  while (n > 0) {
+    const rem = (n - 1) % 26;
+    label = ALPHABET[rem] + label;
+    n = Math.floor((n - 1) / 26);
+  }
+  return label;
+}
+
 function ColHeader(props: ColHeaderProps) {
   return (
-    // biome-ignore lint/a11y/useKeyWithMouseEvents: キーボード操作は未対応
+    // biome-ignore lint/a11y/useKeyWithMouseEvents: 親のtableでキー操作を処理している
     <th
       data-slot="gridsheet-colheader"
       onMouseDown={() => props.onMouseDown(props.index)}
@@ -459,7 +547,7 @@ function ColHeader(props: ColHeaderProps) {
       }
       data-selected={props.isSelected || undefined}
     >
-      {colIndexToLabel(props.index)}
+      {getColLabel(props.index)}
     </th>
   );
 }
@@ -474,15 +562,16 @@ interface CellProps<T> {
   isEditing: boolean;
 
   beginEdit: (pos: CellPosition) => void;
-  update: (pos: CellPosition, value: T) => void;
-  stopEditing: () => void;
+  commitEdit: (pos: CellPosition, value: T) => void;
+  cancelEditing: () => void;
 
   setActiveCell?: (pos: CellPosition) => void;
   setSelection?: (range: CellRange | null) => void;
 
   onMouseDown: (pos: CellPosition) => void;
   onMouseOver: (pos: CellPosition) => void;
-  onFocus: (pos: CellPosition) => void;
+
+  registerCellRef: (row: number, col: number, el: HTMLTableCellElement) => void;
 
   renderCell: (ctx: CellRenderContext<T>) => JSX.Element;
 
@@ -490,12 +579,13 @@ interface CellProps<T> {
 }
 
 function Cell<T>(props: CellProps<T>) {
-  let cellRef: HTMLTableCellElement | undefined;
+  let cellRef!: HTMLTableCellElement;
 
   const beginEdit = () => props.beginEdit({ row: props.row, col: props.col });
-  const setValue = (value: T) =>
-    props.update({ row: props.row, col: props.col }, value);
-  const stopEditing = () => props.stopEditing();
+  const commitEdit = (value: T) => {
+    props.commitEdit({ row: props.row, col: props.col }, value);
+  };
+  const cancelEditing = () => props.cancelEditing();
 
   const handleMouseDown = () => {
     props.onMouseDown({ row: props.row, col: props.col });
@@ -504,14 +594,8 @@ function Cell<T>(props: CellProps<T>) {
     props.onMouseOver({ row: props.row, col: props.col });
   };
   const handleDoubleClick = () => {
-    beginEdit();
-  };
-  const handleFocus = () => {
-    props.onFocus({ row: props.row, col: props.col });
-  };
-  const handleBlur = () => {
-    if (props.isEditing) {
-      stopEditing();
+    if (!props.isEditing) {
+      beginEdit();
     }
   };
 
@@ -524,10 +608,10 @@ function Cell<T>(props: CellProps<T>) {
         isSelected: props.isSelected,
         isActive: props.isActive,
         isEditing: props.isEditing,
-        cellRef: cellRef,
-        beginEdit: beginEdit,
-        setValue: setValue,
-        stopEditing: stopEditing,
+        cellRef,
+        beginEdit,
+        commitEdit,
+        cancelEditing,
       });
     } else {
       return props.class;
@@ -535,16 +619,17 @@ function Cell<T>(props: CellProps<T>) {
   });
 
   return (
+    // biome-ignore lint/a11y/useKeyWithMouseEvents: 親のtableでキー操作を処理している
     <td
       data-slot="gridsheet-cell"
-      ref={cellRef}
+      ref={(el) => {
+        cellRef = el;
+        props.registerCellRef(props.row, props.col, el);
+      }}
       onMouseDown={handleMouseDown}
       onMouseOver={handleMouseOver}
-      onFocus={handleFocus}
       onDblClick={handleDoubleClick}
-      onBlur={handleBlur}
-      // biome-ignore lint/a11y/noNoninteractiveTabindex: タブでセル移動できるようにするため
-      tabIndex={0}
+      tabIndex={-1}
       class={className()}
       data-row={props.row}
       data-col={props.col}
@@ -563,22 +648,10 @@ function Cell<T>(props: CellProps<T>) {
         isActive: props.isActive,
         isEditing: props.isEditing,
 
-        beginEdit: beginEdit,
-        setValue: setValue,
-        stopEditing: stopEditing,
+        beginEdit,
+        commitEdit,
+        cancelEditing,
       })}
     </td>
   );
-}
-
-const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-function colIndexToLabel(index: number): string {
-  let label = "";
-  let n = index + 1;
-  while (n > 0) {
-    const rem = (n - 1) % 26;
-    label = ALPHABET[rem] + label;
-    n = Math.floor((n - 1) / 26);
-  }
-  return label;
 }
