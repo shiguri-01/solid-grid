@@ -424,6 +424,7 @@ export function Gridsheet<T>(props: GridsheetProps<T>): JSX.Element {
                 isSelected={isColHeaderSelected(colIndex)}
                 onMouseDown={handleMouseDownOnColHeader}
                 onMouseOver={handleMouseOverOnColHeader}
+                class={props.classes?.colHeader}
               />
             )}
           </Index>
@@ -445,6 +446,7 @@ export function Gridsheet<T>(props: GridsheetProps<T>): JSX.Element {
                 isSelected={isRowHeaderSelected(rowIndex())}
                 onMouseDown={handleMouseDownOnRowHeader}
                 onMouseOver={handleMouseOverOnRowHeader}
+                class={props.classes?.rowHeader}
               />
               <For each={row}>
                 {(cell, colIndex) => (
@@ -478,6 +480,7 @@ export function Gridsheet<T>(props: GridsheetProps<T>): JSX.Element {
                         el,
                       );
                     }}
+                    class={props.classes?.cell}
                   />
                 )}
               </For>
