@@ -260,6 +260,10 @@ export function Gridsheet<T>(props: GridsheetProps<T>): JSX.Element {
   };
 
   const handleMouseDownOnRowHeader = (rowIndex: number) => {
+    if (numCols() === 0) {
+      return;
+    }
+
     batch(() => {
       setIsMouseDown(true);
       setSelectionMode("row");
@@ -287,6 +291,10 @@ export function Gridsheet<T>(props: GridsheetProps<T>): JSX.Element {
   };
 
   const handleMouseDownOnColHeader = (colIndex: number) => {
+    if (numRows() === 0) {
+      return;
+    }
+
     batch(() => {
       setIsMouseDown(true);
       setSelectionMode("col");
@@ -314,8 +322,11 @@ export function Gridsheet<T>(props: GridsheetProps<T>): JSX.Element {
   };
 
   const handleClickOnCorner = () => {
+    if (numCols() === 0 || numRows() === 0) {
+      return;
+    }
+
     batch(() => {
-      if (numCols() === 0 || numRows() === 0) return;
       setIsEditing(false);
       setSelection(
         normalizeRange(
