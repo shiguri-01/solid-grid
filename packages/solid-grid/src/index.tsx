@@ -220,16 +220,37 @@ export function Gridsheet<T>(props: GridsheetProps<T>): JSX.Element {
   const [selectionAnchor, setSelectionAnchor] =
     createSignal<CellPosition | null>(null);
 
+  let previousBodyUserSelect: string | null = null;
+  const disableTextSelectionDuringDrag = () => {
+    if (typeof document === "undefined" || previousBodyUserSelect !== null)
+      return;
+    const body = document.body;
+    if (!body) return;
+    previousBodyUserSelect = body.style.userSelect;
+    body.style.userSelect = "none";
+  };
+  const restoreTextSelectionAfterDrag = () => {
+    if (typeof document === "undefined" || previousBodyUserSelect === null)
+      return;
+    const body = document.body;
+    if (body) {
+      body.style.userSelect = previousBodyUserSelect;
+    }
+    previousBodyUserSelect = null;
+  };
+
   const handleMouseUp = () => {
     setIsMouseDown(false);
     setSelectionMode(DEFAULT_SELECTION_MODE);
     setSelectionAnchor(null);
+    restoreTextSelectionAfterDrag();
   };
   onMount(() => {
     window.addEventListener("mouseup", handleMouseUp);
   });
   onCleanup(() => {
     window.removeEventListener("mouseup", handleMouseUp);
+    restoreTextSelectionAfterDrag();
   });
 
   const handleMouseDownOnCell = (pos: CellPosition) => {
@@ -237,6 +258,7 @@ export function Gridsheet<T>(props: GridsheetProps<T>): JSX.Element {
     if (isCellEditing(pos)) return;
 
     batch(() => {
+      disableTextSelectionDuringDrag();
       setIsMouseDown(true);
       setSelectionMode("cell");
       setSelectionAnchor(pos);
@@ -265,6 +287,7 @@ export function Gridsheet<T>(props: GridsheetProps<T>): JSX.Element {
     }
 
     batch(() => {
+      disableTextSelectionDuringDrag();
       setIsMouseDown(true);
       setSelectionMode("row");
       const start: CellPosition = { row: rowIndex, col: 0 };
@@ -296,6 +319,7 @@ export function Gridsheet<T>(props: GridsheetProps<T>): JSX.Element {
     }
 
     batch(() => {
+      disableTextSelectionDuringDrag();
       setIsMouseDown(true);
       setSelectionMode("col");
       const start: CellPosition = { row: 0, col: colIndex };
