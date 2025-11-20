@@ -362,16 +362,51 @@ export function Gridsheet<T>(props: GridsheetProps<T>): JSX.Element {
     });
   };
 
-  const moveActionCell = (deltaRow: number, deltaCol: number) => {
+  const navigate = (
+    deltaRow: number,
+    deltaCol: number,
+    isSelection: boolean,
+  ) => {
     const ac = activeCell();
     if (!ac) return;
 
-    const nextRow = Math.max(0, Math.min(numRows() - 1, ac.row + deltaRow));
-    const nextCol = Math.max(0, Math.min(numCols() - 1, ac.col + deltaCol));
-    const nextPos = { row: nextRow, col: nextCol };
+    if (isSelection) {
+      let anchor = selectionAnchor();
+      if (!anchor) {
+        anchor = ac;
+        setSelectionAnchor(anchor);
+      }
 
-    setActiveCell(nextPos);
-    setSelection(normalizeRange(nextPos, nextPos));
+      const sel = selection();
+      let headRow = anchor.row;
+      let headCol = anchor.col;
+
+      if (sel) {
+        headRow = sel.min.row === anchor.row ? sel.max.row : sel.min.row;
+        headCol = sel.min.col === anchor.col ? sel.max.col : sel.min.col;
+      }
+
+      const nextHeadRow = Math.max(
+        0,
+        Math.min(numRows() - 1, headRow + deltaRow),
+      );
+      const nextHeadCol = Math.max(
+        0,
+        Math.min(numCols() - 1, headCol + deltaCol),
+      );
+
+      setSelection(
+        normalizeRange(anchor, { row: nextHeadRow, col: nextHeadCol }),
+      );
+    } else {
+      const nextRow = Math.max(0, Math.min(numRows() - 1, ac.row + deltaRow));
+      const nextCol = Math.max(0, Math.min(numCols() - 1, ac.col + deltaCol));
+      const nextPos = { row: nextRow, col: nextCol };
+
+      setActiveCell(nextPos);
+      setSelection(normalizeRange(nextPos, nextPos));
+      setSelectionAnchor(null);
+    }
   };
 
   const handleKeyDown = (e: KeyboardEvent) => {
@@ -386,23 +421,23 @@ export function Gridsheet<T>(props: GridsheetProps<T>): JSX.Element {
     switch (e.key) {
       case "ArrowUp":
         e.preventDefault();
-        moveActionCell(-1, 0);
+        navigate(-1, 0, e.shiftKey);
         break;
       case "ArrowDown":
         e.preventDefault();
-        moveActionCell(1, 0);
+        navigate(1, 0, e.shiftKey);
         break;
       case "ArrowLeft":
         e.preventDefault();
-        moveActionCell(0, -1);
+        navigate(0, -1, e.shiftKey);
         break;
       case "ArrowRight":
         e.preventDefault();
-        moveActionCell(0, 1);
+        navigate(0, 1, e.shiftKey);
         break;
       case "Tab":
         e.preventDefault();
-        moveActionCell(0, e.shiftKey ? -1 : 1);
+        navigate(0, e.shiftKey ? -1 : 1, false);
         break;
       case "Enter":
         e.preventDefault();
