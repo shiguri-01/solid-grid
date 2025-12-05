@@ -43,10 +43,15 @@ function CellRenderer(ctx: CellRenderContext<string>) {
         // onBlur={() => ctx.cancelEditing()}
         onKeyDown={(e) => {
           if (e.isComposing) return;
-          if (e.key === "Enter" || e.key === "Escape") {
+          if (e.key === "Enter") {
             e.preventDefault();
             e.stopPropagation();
             ctx.commitEdit(inputRef?.value ?? ctx.value);
+            ctx.cancelEditing();
+            ctx.cellRef?.focus();
+          } else if (e.key === "Escape") {
+            e.preventDefault();
+            e.stopPropagation();
             ctx.cancelEditing();
             ctx.cellRef?.focus();
           }
