@@ -253,9 +253,20 @@ export function Gridsheet<T>(props: GridsheetProps<T>): JSX.Element {
     restoreTextSelectionAfterDrag();
   });
 
-  const handleMouseDownOnCell = (pos: CellPosition) => {
+  const handleMouseDownOnCell = (pos: CellPosition, e: MouseEvent) => {
+    if (e.button !== 0) return;
+
     // 編集中のセルは選択操作を無効化し、編集状態を維持する
     if (isCellEditing(pos)) return;
+
+    // ダブルクリック(2回目のmousedown)で即座に編集に入る
+    if (e.detail === 2) {
+      e.preventDefault();
+      beginCellEdit(pos);
+      return;
+    }
+
+    e.preventDefault();
 
     batch(() => {
       disableTextSelectionDuringDrag();
@@ -268,7 +279,10 @@ export function Gridsheet<T>(props: GridsheetProps<T>): JSX.Element {
       setActiveCell(pos);
     });
   };
-  const handleMouseOverOnCell = (pos: CellPosition) => {
+  const handleMouseOverOnCell = (pos: CellPosition, e: MouseEvent) => {
+    // ドラッグされていない場合は何もしない
+    if ((e.buttons & 1) === 0) return;
+
     batch(() => {
       if (!isMouseDown() || selectionMode() !== "cell") return;
 
@@ -641,8 +655,8 @@ interface CellProps<T> {
   setActiveCell?: (pos: CellPosition) => void;
   setSelection?: (range: CellRange | null) => void;
 
-  onMouseDown: (pos: CellPosition) => void;
-  onMouseOver: (pos: CellPosition) => void;
+  onMouseDown: (pos: CellPosition, e: MouseEvent) => void;
+  onMouseOver: (pos: CellPosition, e: MouseEvent) => void;
 
   registerCellRef: (row: number, col: number, el: HTMLTableCellElement) => void;
 
@@ -660,13 +674,15 @@ function Cell<T>(props: CellProps<T>) {
   };
   const cancelEditing = () => props.cancelEditing();
 
-  const handleMouseDown = () => {
-    props.onMouseDown({ row: props.row, col: props.col });
+  const handleMouseDown = (e: MouseEvent) => {
+    props.onMouseDown({ row: props.row, col: props.col }, e);
   };
-  const handleMouseOver = () => {
-    props.onMouseOver({ row: props.row, col: props.col });
+  const handleMouseOver = (e: MouseEvent) => {
+    props.onMouseOver({ row: props.row, col: props.col }, e);
   };
-  const handleDoubleClick = () => {
+  const handleDoubleClick = (e: MouseEvent) => {
+    if (e.button !== 0) return;
+    e.preventDefault();
     if (!props.isEditing) {
       beginEdit();
     }
