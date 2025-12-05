@@ -1,5 +1,6 @@
 {
   "name": "@shiguri/solid-grid",
+  "private": false,
   "author": {
     "name": "shiguri",
     "url": "https://github.com/shiguri-01"

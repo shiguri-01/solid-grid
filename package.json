@@ -1,7 +1,7 @@
 {
   "name": "solid-grid",
   "type": "module",
-  "private": true,
+  "private": false,
   "scripts": {
     "prepare": "lefthook install",
     "lint": "biome lint --write",
