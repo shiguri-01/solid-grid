@@ -4,11 +4,11 @@
     "name": "shiguri",
     "url": "https://github.com/shiguri-01"
   },
-  "repositry": {
+  "repository": {
     "type": "git",
     "url": "https://github.com/shiguri-01/solid-grid"
   },
-  "lisence": "MIT",
+  "license": "MIT",
   "version": "0.0.1",
   "type": "module",
   "main": "./dist/index.js",
