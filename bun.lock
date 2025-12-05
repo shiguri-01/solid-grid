@@ -24,7 +24,7 @@
       },
     },
     "packages/solid-grid": {
-      "name": "@sg/solid-grid",
+      "name": "@shiguri/solid-grid",
       "version": "0.0.1",
       "devDependencies": {
         "rolldown-plugin-solid": "^0.2.1",
@@ -262,7 +262,7 @@
 
     "@sg/example-basic": ["@sg/example-basic@workspace:examples/basic"],
 
-    "@sg/solid-grid": ["@sg/solid-grid@workspace:packages/solid-grid"],
+    "@shiguri/solid-grid": ["@shiguri/solid-grid@workspace:packages/solid-grid"],
 
     "@tybys/wasm-util": ["@tybys/wasm-util@0.10.1", "", { "dependencies": { "tslib": "^2.4.0" } }, "sha512-9tTaPJLSiejZKx+Bmog4uSubteqTvFrVrURwkmHixBo0G4seD0zUxp98E1DzUBJxLQ3NPwXrGKDiVjwx/DpPsg=="],
 
