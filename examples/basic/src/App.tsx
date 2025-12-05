@@ -1,5 +1,5 @@
-import type { CellRenderContext } from "solid-grid";
-import { Gridsheet } from "solid-grid";
+import type { CellRenderContext } from "@shiguri/solid-grid";
+import { Gridsheet } from "@shiguri/solid-grid";
 import { createEffect, createSignal } from "solid-js";
 import "./App.css";
 

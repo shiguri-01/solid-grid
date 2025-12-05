@@ -26,7 +26,7 @@
     "noUncheckedSideEffectImports": true,
 
     "paths": {
-      "solid-grid": ["../../packages/solid-grid/src"]
+      "@shiguri/solid-grid": ["../../packages/solid-grid/src"]
     }
   },
   "include": ["src"]
