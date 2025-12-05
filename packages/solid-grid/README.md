@@ -1,17 +1,14 @@
 # solid-grid
 
-A headless spreadsheet-like grid component for [SolidJS](https://www.solidjs.com/).
+Headless spreadsheet-like grid for SolidJS. Works with a 2D array (`T[][]`) and gives you full control over rendering and styling.
 
-- Generic `T[][]` data structure
-- Keyboard navigation & mouse selection
-
-## Installation
+## Install
 
 ```bash
 npm install @shiguri/solid-grid
 ```
 
-## Usage
+## Quick Start
 
 ```tsx
 import { Gridsheet } from "@shiguri/solid-grid";
@@ -40,10 +37,6 @@ const [data, setData] = createSignal([
 />;
 ```
 
-## Documentation
+## More Info
 
-See [docs/](./docs/README.md) for full documentation.
-
----
-
-@ 2025 shiguri | [MIT License](./LICENSE)
+See full docs in the root repository `docs/`.
