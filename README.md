@@ -1,15 +1,49 @@
-# solid-grid
+# @shiguri/solid-grid
 
-To install dependencies:
+A headless spreadsheet-like grid component for [SolidJS](https://www.solidjs.com/).
+
+- Generic `T[][]` data structure
+- Keyboard navigation & mouse selection
+
+## Installation
 
 ```bash
-bun install
+npm install @shiguri/solid-grid
 ```
 
-To run:
+## Usage
 
-```bash
-bun run index.ts
+```tsx
+import { Gridsheet } from "@shiguri/solid-grid";
+import { createSignal } from "solid-js";
+
+const [data, setData] = createSignal([
+  ["A1", "B1"],
+  ["A2", "B2"],
+]);
+
+<Gridsheet
+  data={data()}
+  onDataChange={setData}
+  renderCell={(ctx) =>
+    ctx.isEditing ? (
+      <input
+        value={ctx.value}
+        onKeyDown={(e) =>
+          e.key === "Enter" && ctx.commitEdit(e.currentTarget.value)
+        }
+      />
+    ) : (
+      <span>{ctx.value}</span>
+    )
+  }
+/>;
 ```
 
-This project was created using `bun init` in bun v1.3.1. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
+## Documentation
+
+See [docs/](./docs/README.md) for full documentation.
+
+---
+
+@ 2025 shiguri | [MIT License](./LICENSE)
