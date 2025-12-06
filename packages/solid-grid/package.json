@@ -1,5 +1,6 @@
 {
   "name": "@shiguri/solid-grid",
+  "version": "0.0.1",
   "private": false,
   "author": {
     "name": "shiguri",
@@ -7,10 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/shiguri-01/solid-grid"
+    "url": "https://github.com/shiguri-01/solid-grid.git",
+    "directory": "packages/solid-grid"
   },
+  "homepage": "https://github.com/shiguri-01/solid-grid",
+  "keywords": [
+    "solidjs"
+  ],
   "license": "MIT",
-  "version": "0.0.1",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
