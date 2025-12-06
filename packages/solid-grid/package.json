@@ -9,7 +9,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/shiguri-01/solid-grid.git",
-    "directory": "pacakges/solid-grid"
+    "directory": "packages/solid-grid"
   },
   "homepage": "https://github.com/shiguri-01/solid-grid",
   "keywords": [
