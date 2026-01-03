@@ -20,6 +20,11 @@ export interface CellRange {
   max: CellPosition;
 }
 
+export interface ClipboardData<T> {
+  data: T[][];
+  range: CellRange;
+}
+
 function isPositionInRange(pos: CellPosition, range: CellRange): boolean {
   return (
     pos.row >= range.min.row &&
@@ -93,6 +98,25 @@ export interface GridsheetProps<T> {
   /** Is the active cell in editing mode */
   isEditing?: boolean;
   onIsEditingChange?: (isEditing: boolean) => void;
+
+  /** Clipboard data (for copy/cut operations) */
+  clipboard?: ClipboardData<T> | null;
+  onClipboardChange?: (clipboard: ClipboardData<T> | null) => void;
+
+  /** Called when copy is triggered. Return false to prevent default behavior */
+  onCopy?: (data: T[][], range: CellRange) => boolean | undefined;
+
+  /** Called when cut is triggered. Return false to prevent default behavior */
+  onCut?: (data: T[][], range: CellRange) => boolean | undefined;
+
+  /** Called when paste is triggered. Return modified data to apply changes */
+  onPaste?: (
+    clipboardData: T[][],
+    targetPosition: CellPosition,
+  ) => T[][] | false | undefined;
+
+  /** Called when delete is triggered */
+  onDelete?: (range: CellRange) => void;
 
   ref?: HTMLTableElement | ((el: HTMLTableElement) => void) | undefined;
   class?: string;
@@ -185,6 +209,89 @@ export function Gridsheet<T>(props: GridsheetProps<T>): JSX.Element {
 
   const isCellEditing = (pos: CellPosition) => {
     return isEditing() && isCellActive(pos);
+  };
+
+  const [innerClipboard, setInnerClipboard] =
+    createSignal<ClipboardData<T> | null>(null);
+  const clipboard = createMemo(() =>
+    props.clipboard === undefined ? innerClipboard() : props.clipboard,
+  );
+  const setClipboard = (data: ClipboardData<T> | null) => {
+    setInnerClipboard(data);
+
+    if (props.onClipboardChange) {
+      props.onClipboardChange(data);
+    }
+  };
+
+  const extractSelection = (range: CellRange): T[][] => {
+    const result: T[][] = [];
+    for (let r = range.min.row; r <= range.max.row; r++) {
+      const row: T[] = [];
+      for (let c = range.min.col; c <= range.max.col; c++) {
+        const rowData = props.data[r];
+        if (rowData && c < rowData.length) {
+          const value = rowData[c];
+          if (value !== undefined) {
+            row.push(value);
+          }
+        }
+      }
+      result.push(row);
+    }
+    return result;
+  };
+
+  const handleCopy = () => {
+    const sel = selection();
+    if (!sel) return;
+
+    const copiedData = extractSelection(sel);
+
+    if (props.onCopy) {
+      const result = props.onCopy(copiedData, sel);
+      if (result === false) return;
+    }
+
+    setClipboard({ data: copiedData, range: sel });
+  };
+
+  const handleCut = () => {
+    const sel = selection();
+    if (!sel) return;
+
+    const copiedData = extractSelection(sel);
+
+    if (props.onCut) {
+      const result = props.onCut(copiedData, sel);
+      if (result === false) return;
+    }
+
+    setClipboard({ data: copiedData, range: sel });
+  };
+
+  const handlePaste = () => {
+    const ac = activeCell();
+    const clip = clipboard();
+    if (!ac || !clip) return;
+
+    if (props.onPaste) {
+      const result = props.onPaste(clip.data, ac);
+      if (result === false) return;
+
+      if (result && props.onDataChange) {
+        props.onDataChange(result);
+      }
+    }
+  };
+
+  const handleDelete = () => {
+    const sel = selection();
+    if (!sel) return;
+
+    if (props.onDelete) {
+      props.onDelete(sel);
+    }
   };
 
   const beginCellEdit = (pos: CellPosition) => {
@@ -456,6 +563,29 @@ export function Gridsheet<T>(props: GridsheetProps<T>): JSX.Element {
       case "Enter":
         e.preventDefault();
         beginCellEdit(ac);
+        break;
+      case "c":
+        if (e.ctrlKey || e.metaKey) {
+          e.preventDefault();
+          handleCopy();
+        }
+        break;
+      case "x":
+        if (e.ctrlKey || e.metaKey) {
+          e.preventDefault();
+          handleCut();
+        }
+        break;
+      case "v":
+        if (e.ctrlKey || e.metaKey) {
+          e.preventDefault();
+          handlePaste();
+        }
+        break;
+      case "Delete":
+      case "Backspace":
+        e.preventDefault();
+        handleDelete();
         break;
 
       default:
