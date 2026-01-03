@@ -251,3 +251,114 @@ function ClipboardGrid() {
   );
 }
 ```
+
+---
+
+## System Clipboard Integration
+
+Integrate with the system clipboard for Excel/Google Sheets compatibility:
+
+```tsx
+import { Gridsheet } from "@shiguri/solid-grid";
+import type { CellRange, CellPosition } from "@shiguri/solid-grid";
+import { createSignal } from "solid-js";
+
+function SystemClipboardGrid() {
+  const [data, setData] = createSignal([
+    ["A1", "B1", "C1"],
+    ["A2", "B2", "C2"],
+    ["A3", "B3", "C3"],
+  ]);
+
+  const handleCopy = async (copiedData: string[][], range: CellRange) => {
+    // Convert to TSV format (Tab-Separated Values)
+    const tsv = copiedData.map((row) => row.join("\t")).join("\n");
+
+    try {
+      await navigator.clipboard.writeText(tsv);
+    } catch (err) {
+      console.error("Failed to write to system clipboard", err);
+    }
+  };
+
+  const handlePaste = async (
+    clipboardData: string[][],
+    position: CellPosition,
+  ) => {
+    try {
+      // Read from system clipboard
+      const text = await navigator.clipboard.readText();
+      const parsed = text.split("\n").map((line) => line.split("\t"));
+
+      // Merge into data
+      const nextData = data().map((row) => row.slice());
+
+      for (let r = 0; r < parsed.length; r++) {
+        const targetRow = position.row + r;
+        if (targetRow >= nextData.length) break;
+
+        for (let c = 0; c < parsed[r].length; c++) {
+          const targetCol = position.col + c;
+          if (targetCol >= nextData[targetRow].length) break;
+
+          nextData[targetRow][targetCol] = parsed[r][c];
+        }
+      }
+
+      return nextData;
+    } catch (err) {
+      console.error("Failed to read from system clipboard", err);
+      // Fallback: use internal clipboard data
+      const nextData = data().map((row) => row.slice());
+
+      for (let r = 0; r < clipboardData.length; r++) {
+        const targetRow = position.row + r;
+        if (targetRow >= nextData.length) break;
+
+        for (let c = 0; c < clipboardData[r].length; c++) {
+          const targetCol = position.col + c;
+          if (targetCol >= nextData[targetRow].length) break;
+
+          nextData[targetRow][targetCol] = clipboardData[r][c];
+        }
+      }
+
+      return nextData;
+    }
+  };
+
+  const handleDelete = (range: CellRange) => {
+    const nextData = data().map((row) => row.slice());
+
+    for (let r = range.min.row; r <= range.max.row; r++) {
+      for (let c = range.min.col; c <= range.max.col; c++) {
+        nextData[r][c] = "";
+      }
+    }
+
+    setData(nextData);
+  };
+
+  const handleCut = (copiedData: string[][], range: CellRange) => {
+    handleCopy(copiedData, range);
+    handleDelete(range);
+  };
+
+  return (
+    <Gridsheet
+      data={data()}
+      onDataChange={setData}
+      onCopy={handleCopy}
+      onPaste={handlePaste}
+      onDelete={handleDelete}
+      onCut={handleCut}
+      renderCell={(ctx) => <span>{ctx.value}</span>}
+    />
+  );
+}
+```
+
+> **Note**: The Clipboard API requires:
+> - **HTTPS** (except for `localhost`)
+> - **User interaction** (keyboard/mouse events) - works with Ctrl+C/V
+> - **Focused page** (won't work in background tabs)
