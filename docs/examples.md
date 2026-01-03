@@ -184,3 +184,70 @@ function StyledGrid() {
   );
 }
 ```
+
+---
+
+## Copy/Paste/Cut Support
+
+Handle clipboard operations with custom logic:
+
+```tsx
+import { Gridsheet } from "@shiguri/solid-grid";
+import type { CellRange, CellPosition } from "@shiguri/solid-grid";
+import { createSignal } from "solid-js";
+
+function ClipboardGrid() {
+  const [data, setData] = createSignal([
+    ["A1", "B1", "C1"],
+    ["A2", "B2", "C2"],
+    ["A3", "B3", "C3"],
+  ]);
+
+  const handlePaste = (clipboardData: string[][], position: CellPosition) => {
+    const nextData = data().map((row) => row.slice());
+
+    for (let r = 0; r < clipboardData.length; r++) {
+      const targetRow = position.row + r;
+      if (targetRow >= nextData.length) break;
+
+      for (let c = 0; c < clipboardData[r].length; c++) {
+        const targetCol = position.col + c;
+        if (targetCol >= nextData[targetRow].length) break;
+
+        nextData[targetRow][targetCol] = clipboardData[r][c];
+      }
+    }
+
+    return nextData;
+  };
+
+  const handleDelete = (range: CellRange) => {
+    const nextData = data().map((row) => row.slice());
+
+    for (let r = range.min.row; r <= range.max.row; r++) {
+      for (let c = range.min.col; c <= range.max.col; c++) {
+        nextData[r][c] = "";
+      }
+    }
+
+    setData(nextData);
+  };
+
+  const handleCut = (copiedData: string[][], range: CellRange) => {
+    // First, the data is copied to clipboard
+    // Then, clear the cells
+    handleDelete(range);
+  };
+
+  return (
+    <Gridsheet
+      data={data()}
+      onDataChange={setData}
+      onPaste={handlePaste}
+      onDelete={handleDelete}
+      onCut={handleCut}
+      renderCell={(ctx) => <span>{ctx.value}</span>}
+    />
+  );
+}
+```

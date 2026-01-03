@@ -27,6 +27,12 @@ import { Gridsheet } from "@shiguri/solid-grid";
 | `onSelectionChange`  | `(range: CellRange \| null) => void`         |          | Callback when selection changes    |
 | `isEditing`          | `boolean`                                    |          | Controlled editing state           |
 | `onIsEditingChange`  | `(isEditing: boolean) => void`               |          | Callback when editing changes      |
+| `clipboard`          | `ClipboardData<T> \| null`                   |          | Controlled clipboard state         |
+| `onClipboardChange`  | `(clipboard: ClipboardData<T> \| null) => void` |       | Callback when clipboard changes    |
+| `onCopy`             | `(data: T[][], range: CellRange) => boolean \| undefined` |          | Called on copy (Ctrl+C). Return `false` to prevent |
+| `onCut`              | `(data: T[][], range: CellRange) => boolean \| undefined` |          | Called on cut (Ctrl+X). Return `false` to prevent |
+| `onPaste`            | `(data: T[][], pos: CellPosition) => T[][] \| false \| undefined` |          | Called on paste (Ctrl+V). Return new data to apply |
+| `onDelete`           | `(range: CellRange) => void`                 |          | Called on delete (Delete/Backspace) |
 | `class`              | `string`                                     |          | CSS class for the table            |
 | `style`              | `JSX.CSSProperties \| string`                |          | Inline styles                      |
 | `classes`            | `GridClasses<T>`                             |          | CSS classes for various grid parts |
@@ -60,6 +66,15 @@ interface CellPosition {
 interface CellRange {
   min: CellPosition; // Top-left
   max: CellPosition; // Bottom-right
+}
+```
+
+### ClipboardData\<T\>
+
+```typescript
+interface ClipboardData<T> {
+  data: T[][];       // Copied cell data
+  range: CellRange;  // Source range
 }
 ```
 
