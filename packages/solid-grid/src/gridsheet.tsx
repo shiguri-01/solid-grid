@@ -61,7 +61,7 @@ export interface CellRenderContext<T> {
   cancelEditing: () => void;
 }
 
-export type GridEvent<T> =
+export type GridEvent =
   | { type: "cell:pointerdown"; pos: CellPosition; e: MouseEvent }
   | { type: "cell:pointerover"; pos: CellPosition; e: MouseEvent }
   | { type: "cell:dblclick"; pos: CellPosition; e: MouseEvent }
@@ -75,7 +75,7 @@ export type GridEvent<T> =
  * return true なら「イベント消費」扱い（後続に渡さない）
  */
 export type GridEventHandler<T> = (
-  ev: GridEvent<T>,
+  ev: GridEvent,
   api: GridApi<T>,
 ) => boolean | undefined;
 
@@ -218,7 +218,7 @@ function createGridApi<T>(props: GridsheetProps<T>): GridApi<T> {
 export function Gridsheet<T>(props: GridsheetProps<T>): JSX.Element {
   const api = createGridApi(props);
 
-  const emit = (ev: GridEvent<T>) => {
+  const emit = (ev: GridEvent) => {
     props.onEvent?.(ev, api);
   };
 
