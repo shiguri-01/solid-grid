@@ -29,9 +29,9 @@ import { Gridsheet } from "@shiguri/solid-grid";
 | `onIsEditingChange`  | `(isEditing: boolean) => void`               |          | Callback when editing changes      |
 | `clipboard`          | `ClipboardData<T> \| null`                   |          | Controlled clipboard state         |
 | `onClipboardChange`  | `(clipboard: ClipboardData<T> \| null) => void` |       | Callback when clipboard changes    |
-| `onCopy`             | `(data: T[][], range: CellRange) => boolean \| undefined` |          | Called on copy (Ctrl+C). Return `false` to prevent. Can be async for system clipboard |
-| `onCut`              | `(data: T[][], range: CellRange) => boolean \| undefined` |          | Called on cut (Ctrl+X). Return `false` to prevent. Can be async for system clipboard |
-| `onPaste`            | `(data: T[][], pos: CellPosition) => T[][] \| false \| undefined` |          | Called on paste (Ctrl+V). Return new data to apply, or `false` to prevent. Can be async for system clipboard. **Required for paste to work** |
+| `onCopy`             | `(data: T[][], range: CellRange) => boolean \| undefined` |          | Called on copy (Ctrl+C). **Required for copy to work**. Return `false` to prevent clipboard update. Can be async |
+| `onCut`              | `(data: T[][], range: CellRange) => boolean \| undefined` |          | Called on cut (Ctrl+X). **Required for cut to work**. Return `false` to prevent clipboard update. Can be async |
+| `onPaste`            | `(data: T[][], pos: CellPosition) => T[][] \| false \| undefined` |          | Called on paste (Ctrl+V). **Required for paste to work**. Return new data to apply, or `false` to prevent. Can be async |
 | `onDelete`           | `(range: CellRange) => void`                 |          | Called on delete (Delete/Backspace). **Required for delete to work** |
 | `class`              | `string`                                     |          | CSS class for the table            |
 | `style`              | `JSX.CSSProperties \| string`                |          | Inline styles                      |
