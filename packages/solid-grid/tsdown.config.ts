@@ -5,5 +5,6 @@ export default defineConfig({
   entry: ["./src/index.tsx"],
   platform: "neutral",
   dts: true,
+  unbundle: true,
   plugins: [solid()],
 });
