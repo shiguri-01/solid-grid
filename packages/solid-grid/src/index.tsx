@@ -103,17 +103,23 @@ export interface GridsheetProps<T> {
   clipboard?: ClipboardData<T> | null;
   onClipboardChange?: (clipboard: ClipboardData<T> | null) => void;
 
-  /** Called when copy is triggered. Return false to prevent default behavior */
-  onCopy?: (data: T[][], range: CellRange) => boolean | undefined;
+  /** Called when copy is triggered. Return false to prevent default behavior. Can be async */
+  onCopy?: (
+    data: T[][],
+    range: CellRange,
+  ) => boolean | undefined | Promise<boolean | undefined>;
 
-  /** Called when cut is triggered. Return false to prevent default behavior */
-  onCut?: (data: T[][], range: CellRange) => boolean | undefined;
+  /** Called when cut is triggered. Return false to prevent default behavior. Can be async */
+  onCut?: (
+    data: T[][],
+    range: CellRange,
+  ) => boolean | undefined | Promise<boolean | undefined>;
 
-  /** Called when paste is triggered. Return modified data to apply changes */
+  /** Called when paste is triggered. Return modified data to apply changes. Can be async */
   onPaste?: (
     clipboardData: T[][],
     targetPosition: CellPosition,
-  ) => T[][] | false | undefined;
+  ) => T[][] | false | undefined | Promise<T[][] | false | undefined>;
 
   /** Called when delete is triggered */
   onDelete?: (range: CellRange) => void;
@@ -242,41 +248,41 @@ export function Gridsheet<T>(props: GridsheetProps<T>): JSX.Element {
     return result;
   };
 
-  const handleCopy = () => {
+  const handleCopy = async () => {
     const sel = selection();
     if (!sel) return;
 
     const copiedData = extractSelection(sel);
 
     if (props.onCopy) {
-      const result = props.onCopy(copiedData, sel);
+      const result = await props.onCopy(copiedData, sel);
       if (result === false) return;
     }
 
     setClipboard({ data: copiedData, range: sel });
   };
 
-  const handleCut = () => {
+  const handleCut = async () => {
     const sel = selection();
     if (!sel) return;
 
     const copiedData = extractSelection(sel);
 
     if (props.onCut) {
-      const result = props.onCut(copiedData, sel);
+      const result = await props.onCut(copiedData, sel);
       if (result === false) return;
     }
 
     setClipboard({ data: copiedData, range: sel });
   };
 
-  const handlePaste = () => {
+  const handlePaste = async () => {
     const ac = activeCell();
     const clip = clipboard();
     if (!ac || !clip) return;
 
     if (props.onPaste) {
-      const result = props.onPaste(clip.data, ac);
+      const result = await props.onPaste(clip.data, ac);
       if (result === false) return;
 
       if (result && props.onDataChange) {

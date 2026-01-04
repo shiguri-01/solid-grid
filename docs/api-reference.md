@@ -29,10 +29,10 @@ import { Gridsheet } from "@shiguri/solid-grid";
 | `onIsEditingChange`  | `(isEditing: boolean) => void`               |          | Callback when editing changes      |
 | `clipboard`          | `ClipboardData<T> \| null`                   |          | Controlled clipboard state         |
 | `onClipboardChange`  | `(clipboard: ClipboardData<T> \| null) => void` |       | Callback when clipboard changes    |
-| `onCopy`             | `(data: T[][], range: CellRange) => boolean \| undefined` |          | Called on copy (Ctrl+C). Return `false` to prevent |
-| `onCut`              | `(data: T[][], range: CellRange) => boolean \| undefined` |          | Called on cut (Ctrl+X). Return `false` to prevent |
-| `onPaste`            | `(data: T[][], pos: CellPosition) => T[][] \| false \| undefined` |          | Called on paste (Ctrl+V). Return new data to apply |
-| `onDelete`           | `(range: CellRange) => void`                 |          | Called on delete (Delete/Backspace) |
+| `onCopy`             | `(data: T[][], range: CellRange) => boolean \| undefined` |          | Called on copy (Ctrl+C). Return `false` to prevent. Can be async for system clipboard |
+| `onCut`              | `(data: T[][], range: CellRange) => boolean \| undefined` |          | Called on cut (Ctrl+X). Return `false` to prevent. Can be async for system clipboard |
+| `onPaste`            | `(data: T[][], pos: CellPosition) => T[][] \| false \| undefined` |          | Called on paste (Ctrl+V). Return new data to apply, or `false` to prevent. Can be async for system clipboard. **Required for paste to work** |
+| `onDelete`           | `(range: CellRange) => void`                 |          | Called on delete (Delete/Backspace). **Required for delete to work** |
 | `class`              | `string`                                     |          | CSS class for the table            |
 | `style`              | `JSX.CSSProperties \| string`                |          | Inline styles                      |
 | `classes`            | `GridClasses<T>`                             |          | CSS classes for various grid parts |

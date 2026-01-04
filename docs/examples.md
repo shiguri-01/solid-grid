@@ -191,6 +191,8 @@ function StyledGrid() {
 
 Handle clipboard operations with custom logic:
 
+> **Note**: `onPaste` is **required** for paste operations to work. Without it, Ctrl+V will do nothing. Similarly, `onDelete` is **required** for delete operations.
+
 ```tsx
 import { Gridsheet } from "@shiguri/solid-grid";
 import type { CellRange, CellPosition } from "@shiguri/solid-grid";
@@ -257,6 +259,8 @@ function ClipboardGrid() {
 ## System Clipboard Integration
 
 Integrate with the system clipboard for Excel/Google Sheets compatibility:
+
+> **Note**: Async handlers work correctly. The callback can return a Promise, and the library will handle it properly for system clipboard integration.
 
 ```tsx
 import { Gridsheet } from "@shiguri/solid-grid";
