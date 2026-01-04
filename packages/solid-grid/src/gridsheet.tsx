@@ -128,7 +128,7 @@ function createControllable<T>(
     propsValue() === undefined ? inner() : (propsValue() as T),
   );
   const set = (v: T) => {
-    setInner(v);
+    setInner(() => v);
     onChange?.(v);
   };
   return [value, set] as const;
