@@ -9,6 +9,7 @@
 - **Keyboard navigation** - Arrow keys, Tab, Enter support
 - **Mouse selection** - Click, drag, and multi-select support
 - **Inline editing** - Built-in editing mode with customizable editors
+- **Copy/Paste/Cut** - Clipboard operations with customizable handlers (Ctrl+C/X/V)
 - **Row/Column selection** - Click headers to select entire rows or columns
 - **Controlled & Uncontrolled** - Support for both state management patterns
 - **Lightweight** - Zero dependencies (except SolidJS peer dependency)
