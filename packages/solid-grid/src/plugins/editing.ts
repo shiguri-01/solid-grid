@@ -4,6 +4,7 @@ type EditingPluginOptions = {
   triggerKeys?: string[];
 };
 
+/** Starts editing via double click or configured keys. */
 export function editingPlugin<T>(
   options: EditingPluginOptions = {},
 ): GridPlugin<T> {

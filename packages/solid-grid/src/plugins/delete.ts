@@ -1,6 +1,7 @@
 import type { CellPatch, CellPosition, CellRange } from "../gridsheet";
 import type { GridPlugin } from "../plugin";
 
+/** Options for delete behavior. */
 export type DeletePluginOptions<T> = {
   keys?: string[];
   emptyValue?: T;
@@ -22,6 +23,7 @@ function buildClearPatches<T>(
   return patches;
 }
 
+/** Clears selected range with provided empty values. */
 export function deletePlugin<T>(
   options: DeletePluginOptions<T>,
 ): GridPlugin<T> {

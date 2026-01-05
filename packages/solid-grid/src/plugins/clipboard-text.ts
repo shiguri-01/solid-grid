@@ -1,6 +1,7 @@
 import type { CellPatch, CellPosition } from "../gridsheet";
 import type { GridPlugin } from "../plugin";
 
+/** Options for system clipboard text/TSV behavior. */
 export type ClipboardTextPluginOptions<T> = {
   getData: () => T[][];
   toText?: (data: T[][]) => string;
@@ -75,6 +76,7 @@ function buildClearPatches<T>(
   return patches;
 }
 
+/** System clipboard integration with TSV defaults. */
 export function clipboardTextPlugin<T>(
   options: ClipboardTextPluginOptions<T>,
 ): GridPlugin<T> {

@@ -17,6 +17,7 @@ function moveBy(
   };
 }
 
+/** Selection, drag, and arrow-key navigation. */
 export function selectionPlugin<T>(): GridPlugin<T> {
   let anchor: CellPosition | null = null;
   let head: CellPosition | null = null;

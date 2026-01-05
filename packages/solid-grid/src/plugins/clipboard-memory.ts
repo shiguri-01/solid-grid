@@ -6,6 +6,7 @@ export type ClipboardData<T> = {
   range: CellRange;
 };
 
+/** Options for in-memory clipboard behavior. */
 export type ClipboardPluginOptions<T> = {
   getData: () => T[][];
   onCopy?: (
@@ -87,6 +88,7 @@ function buildPastePatches<T>(
   return patches;
 }
 
+/** In-memory clipboard with optional cut clearing. */
 export function clipboardMemoryPlugin<T>(
   options: ClipboardPluginOptions<T>,
 ): GridPlugin<T> {

@@ -10,11 +10,13 @@ import {
 } from "solid-js";
 import type { JSX } from "solid-js/jsx-runtime";
 
+/** Zero-based cell position. */
 export type CellPosition = {
   row: number;
   col: number;
 };
 
+/** Inclusive range of cells. */
 export type CellRange = {
   min: CellPosition;
   max: CellPosition;
@@ -29,6 +31,7 @@ function isPositionInRange(pos: CellPosition, range: CellRange): boolean {
   );
 }
 
+/** Normalize two positions into an inclusive range. */
 export function normalizeRange(
   pos1: CellPosition,
   pos2: CellPosition,
@@ -45,6 +48,7 @@ export function normalizeRange(
   };
 }
 
+/** Render-time context for a single cell. */
 export interface CellRenderContext<T> {
   row: number;
   col: number;
@@ -61,6 +65,7 @@ export interface CellRenderContext<T> {
   cancelEditing: () => void;
 }
 
+/** Events emitted from Gridsheet to plugins/handlers. */
 export type GridEvent =
   | { type: "cell:pointerdown"; pos: CellPosition; e: MouseEvent }
   | { type: "cell:pointerover"; pos: CellPosition; e: MouseEvent }
@@ -71,16 +76,16 @@ export type GridEvent =
   | { type: "colheader:pointerdown"; col: number; e: MouseEvent }
   | { type: "pointer:up"; e: PointerEvent | MouseEvent };
 
-/**
- * return true なら「イベント消費」扱い（後続に渡さない）
- */
+/** Return true to stop further handling. */
 export type GridEventHandler<T> = (
   ev: GridEvent,
   api: GridApi<T>,
 ) => boolean | undefined;
 
+/** Props for the Gridsheet component. */
 export interface GridsheetProps<T> {
   data: T[][];
+  /** Apply patches to external data store. */
   onCellsChange?: (patches: CellPatch<T>[]) => void;
 
   renderCell: (ctx: CellRenderContext<T>) => JSX.Element;
@@ -134,7 +139,9 @@ function createControllable<T>(
   return [value, set] as const;
 }
 
+/** Patch for a single cell update. */
 export type CellPatch<T> = { pos: CellPosition; value: T };
+/** API exposed to plugins and external handlers. */
 export type GridApi<T> = {
   // state readers
   numRows: () => number;
