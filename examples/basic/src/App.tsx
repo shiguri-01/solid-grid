@@ -1,7 +1,25 @@
-import type { CellRenderContext } from "@shiguri/solid-grid";
-import { Gridsheet } from "@shiguri/solid-grid";
+import type { CellPatch, CellRenderContext } from "@shiguri/solid-grid";
+import {
+  clipboardTextPlugin,
+  createPluginHost,
+  deletePlugin,
+  editingPlugin,
+  Gridsheet,
+  selectionPlugin,
+} from "@shiguri/solid-grid";
 import { createEffect, createSignal } from "solid-js";
 import "./App.css";
+
+function applyPatches<T>(data: T[][], patches: CellPatch<T>[]): T[][] {
+  const next = data.map((row) => row.slice());
+  for (const { pos, value } of patches) {
+    const row = next[pos.row];
+    if (!row) continue;
+    if (pos.col < 0 || pos.col >= row.length) continue;
+    row[pos.col] = value;
+  }
+  return next;
+}
 
 function App() {
   const [data, setData] = createSignal([
@@ -11,13 +29,23 @@ function App() {
     ["A4", "B4", "C4", "D4"],
   ]);
 
+  const plugins = createPluginHost<string>([
+    selectionPlugin(),
+    editingPlugin(),
+    clipboardTextPlugin({ getData: () => data(), emptyValue: "" }),
+    deletePlugin({ emptyValue: "" }),
+  ]);
+
   return (
     <div>
       <h1>Solid Grid - Basic Example</h1>
       <Gridsheet
         data={data()}
-        onDataChange={setData}
+        onCellsChange={(patches) =>
+          setData((prev) => applyPatches(prev, patches))
+        }
         renderCell={CellRenderer}
+        onEvent={plugins.onEvent}
       />
     </div>
   );
@@ -39,15 +67,12 @@ function CellRenderer(ctx: CellRenderContext<string>) {
         ref={inputRef}
         type="text"
         value={ctx.value}
-        // onInput={(e) => ctx.setValue(e.currentTarget.value)}
-        // onBlur={() => ctx.cancelEditing()}
         onKeyDown={(e) => {
           if (e.isComposing) return;
           if (e.key === "Enter") {
             e.preventDefault();
             e.stopPropagation();
             ctx.commitEdit(inputRef?.value ?? ctx.value);
-            ctx.cancelEditing();
             ctx.cellRef?.focus();
           } else if (e.key === "Escape") {
             e.preventDefault();

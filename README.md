@@ -1,9 +1,9 @@
 # solid-grid
 
-A headless spreadsheet-like grid component for [SolidJS](https://www.solidjs.com/).
+A headless, plugin-driven grid component for [SolidJS](https://www.solidjs.com/).
+Designed for **T[][]** data and custom rendering.
 
-- Generic `T[][]` data structure
-- Keyboard navigation & mouse selection
+> **Work in progress**: The API is still evolving and may include breaking changes.
 
 ## Installation
 
@@ -14,36 +14,46 @@ npm install @shiguri/solid-grid
 ## Usage
 
 ```tsx
-import { Gridsheet } from "@shiguri/solid-grid";
 import { createSignal } from "solid-js";
+import {
+  Gridsheet,
+  createPluginHost,
+  selectionPlugin,
+  editingPlugin,
+} from "@shiguri/solid-grid";
 
 const [data, setData] = createSignal([
   ["A1", "B1"],
   ["A2", "B2"],
 ]);
 
+const plugins = createPluginHost([
+  selectionPlugin(),
+  editingPlugin({ triggerKeys: ["Enter"] }),
+]);
+
 <Gridsheet
   data={data()}
-  onDataChange={setData}
-  renderCell={(ctx) =>
-    ctx.isEditing ? (
-      <input
-        value={ctx.value}
-        onKeyDown={(e) =>
-          e.key === "Enter" && ctx.commitEdit(e.currentTarget.value)
-        }
-      />
-    ) : (
-      <span>{ctx.value}</span>
-    )
+  onCellsChange={(patches) =>
+    setData((prev) => {
+      const next = prev.map((row) => row.slice());
+      for (const { pos, value } of patches) {
+        next[pos.row][pos.col] = value;
+      }
+      return next;
+    })
   }
+  renderCell={(ctx) => <span>{ctx.value}</span>}
+  onEvent={plugins.onEvent}
 />;
 ```
 
 ## Documentation
 
-See [docs/](./docs/README.md) for full documentation.
+- `docs/guide.md`
+- `docs/recipes.md`
+- `docs/styling.md`
 
 ---
 
-@ 2025 shiguri | [MIT License](./LICENSE)
+© 2025 shiguri | [MIT License](./LICENSE)

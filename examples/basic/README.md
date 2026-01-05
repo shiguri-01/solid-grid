@@ -1,6 +1,6 @@
-# Basic Example
+# Gridsheet Example
 
-This is a basic example of using `solid-grid` in a Solid.js application.
+This is a Gridsheet example of using `solid-grid` in a Solid.js application.
 
 ## Features
 
@@ -15,4 +15,3 @@ This is a basic example of using `solid-grid` in a Solid.js application.
 bun install
 bun run dev
 ```
-
