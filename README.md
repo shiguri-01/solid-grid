@@ -56,4 +56,4 @@ const plugins = createPluginHost([
 
 ---
 
-@ 2025 shiguri | [MIT License](./LICENSE)
+© 2025 shiguri | [MIT License](./LICENSE)

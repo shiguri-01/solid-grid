@@ -75,7 +75,6 @@ function CellRenderer(ctx: CellRenderContext<string>) {
             e.preventDefault();
             e.stopPropagation();
             ctx.commitEdit(inputRef?.value ?? ctx.value);
-            ctx.cancelEditing();
             ctx.cellRef?.focus();
           } else if (e.key === "Escape") {
             e.preventDefault();
