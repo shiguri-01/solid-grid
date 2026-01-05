@@ -1,5 +1,6 @@
 import type { CellPatch, CellPosition } from "../gridsheet";
 import type { GridPlugin } from "../plugin";
+import { buildClearPatches } from "./utils";
 
 /** Options for system clipboard text/TSV behavior. */
 export type ClipboardTextPluginOptions<T> = {
@@ -57,20 +58,6 @@ function parseTsv<T>(
         pos: { row: target.row + r, col: target.col + c },
         value: parseCell(cols[c] ?? ""),
       });
-    }
-  }
-  return patches;
-}
-
-function buildClearPatches<T>(
-  range: { min: CellPosition; max: CellPosition },
-  getEmptyValue: (pos: CellPosition) => T,
-): CellPatch<T>[] {
-  const patches: CellPatch<T>[] = [];
-  for (let r = range.min.row; r <= range.max.row; r++) {
-    for (let c = range.min.col; c <= range.max.col; c++) {
-      const pos = { row: r, col: c };
-      patches.push({ pos, value: getEmptyValue(pos) });
     }
   }
   return patches;

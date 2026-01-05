@@ -6,14 +6,13 @@ Use `onCellsChange` with a targeted update strategy:
 
 ```ts
 onCellsChange={(patches) =>
-  setData((prev) =>
-    prev.map((row, r) =>
-      row.map((value, c) => {
-        const p = patches.find((x) => x.pos.row === r && x.pos.col === c);
-        return p ? p.value : value;
-      }),
-    ),
-  )
+  setData((prev) => {
+    const next = prev.map((row) => row.slice());
+    for (const { pos, value } of patches) {
+      next[pos.row][pos.col] = value;
+    }
+    return next;
+  })
 }
 ```
 

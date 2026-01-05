@@ -69,7 +69,7 @@ export function selectionPlugin<T>(): GridPlugin<T> {
         case "cell:pointerdown": {
           if (api.isEditing()) return true;
 
-          // 左クリック以外は無視
+          // Ignore non-left clicks
           if (ev.e.button !== 0) return;
 
           ev.e.preventDefault();
@@ -83,11 +83,11 @@ export function selectionPlugin<T>(): GridPlugin<T> {
 
         case "cell:pointerover": {
           if (!dragging) return;
-          // ボタン押してないならドラッグ中扱いにしない
+          // Do not treat as dragging if mouse button is not pressed
           if ((ev.e.buttons & 1) === 0) return;
 
           if (!anchor) {
-            // ここには到達しないはず
+            // This should not be reached
             anchor = ev.pos;
           }
           setRange(anchor, ev.pos, api);
@@ -223,12 +223,12 @@ export function selectionPlugin<T>(): GridPlugin<T> {
           const dc = key === "ArrowLeft" ? -1 : key === "ArrowRight" ? 1 : 0;
 
           if (e.shiftKey) {
-            const rangeAnchor = anchor ?? ac; // 初回shiftの起点は現在地
+            const rangeAnchor = anchor ?? ac; // Initial shift anchor is current position
             const currentHead = head ?? ac;
             const nextHead = moveBy(currentHead, dr, dc, rows, cols);
             setRange(rangeAnchor, nextHead, api);
           } else {
-            // 通常矢印: 単セル移動（anchor/headをリセット）
+            // Normal arrow: single cell move (reset anchor/head)
             const next = moveBy(ac, dr, dc, rows, cols);
             dragging = false;
             setSingle(next, api);
