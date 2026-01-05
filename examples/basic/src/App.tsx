@@ -67,8 +67,6 @@ function CellRenderer(ctx: CellRenderContext<string>) {
         ref={inputRef}
         type="text"
         value={ctx.value}
-        // onInput={(e) => ctx.setValue(e.currentTarget.value)}
-        // onBlur={() => ctx.cancelEditing()}
         onKeyDown={(e) => {
           if (e.isComposing) return;
           if (e.key === "Enter") {

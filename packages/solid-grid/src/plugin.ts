@@ -8,6 +8,7 @@ export type GridPlugin<T> = {
 
 /** Compose multiple plugins into a single event handler. */
 export function createPluginHost<T>(plugins: GridPlugin<T>[]) {
+  // Plugins are executed in order; first plugin to return true stops propagation.
   const onEvent: GridEventHandler<T> = (ev: GridEvent, api: GridApi<T>) => {
     for (const p of plugins) {
       const handled = p.onEvent?.(ev, api);
