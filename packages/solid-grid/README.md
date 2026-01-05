@@ -1,6 +1,9 @@
 # solid-grid
 
-Headless spreadsheet-like grid for SolidJS. Works with a 2D array (`T[][]`) and gives you full control over rendering and styling.
+Headless, plugin-driven grid for SolidJS. Designed for **T[][]** data and
+controlled rendering/styling.
+
+> **Work in progress**: The API is still evolving and may include breaking changes.
 
 ## Install
 
@@ -11,32 +14,44 @@ npm install @shiguri/solid-grid
 ## Quick Start
 
 ```tsx
-import { Gridsheet } from "@shiguri/solid-grid";
 import { createSignal } from "solid-js";
+import {
+  Gridsheet,
+  createPluginHost,
+  selectionPlugin,
+  editingPlugin,
+} from "@shiguri/solid-grid";
 
 const [data, setData] = createSignal([
   ["A1", "B1"],
   ["A2", "B2"],
 ]);
 
+const plugins = createPluginHost([
+  selectionPlugin(),
+  editingPlugin({ triggerKeys: ["Enter"] }),
+]);
+
 <Gridsheet
   data={data()}
-  onDataChange={setData}
-  renderCell={(ctx) =>
-    ctx.isEditing ? (
-      <input
-        value={ctx.value}
-        onKeyDown={(e) =>
-          e.key === "Enter" && ctx.commitEdit(e.currentTarget.value)
-        }
-      />
-    ) : (
-      <span>{ctx.value}</span>
-    )
+  onCellsChange={(patches) =>
+    setData((prev) => {
+      const next = prev.map((row) => row.slice());
+      for (const { pos, value } of patches) {
+        next[pos.row][pos.col] = value;
+      }
+      return next;
+    })
   }
+  renderCell={(ctx) => <span>{ctx.value}</span>}
+  onEvent={plugins.onEvent}
 />;
 ```
 
-## More Info
+## Docs
 
-See full docs in the root repository `docs/`.
+See full docs in the root repository `docs/`:
+
+- `docs/guide.md`
+- `docs/recipes.md`
+- `docs/styling.md`
