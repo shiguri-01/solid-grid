@@ -114,7 +114,6 @@ function CellRenderer(ctx: CellRenderContext<number>) {
       return;
     }
     ctx.commitEdit(next);
-    ctx.cancelEditing();
   };
 
   return (

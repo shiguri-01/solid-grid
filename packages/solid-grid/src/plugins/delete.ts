@@ -28,7 +28,10 @@ export function deletePlugin<T>(
       if (!keys.includes(e.key)) return;
 
       const range = api.selection();
-      if (!range) return true;
+      if (!range) {
+        e.preventDefault();
+        return true;
+      }
 
       const result = options.onDelete?.(range);
       if (result === false) {
