@@ -73,7 +73,9 @@ export type GridEvent =
   | { type: "key:down"; e: KeyboardEvent }
   | { type: "corner:click"; e: MouseEvent }
   | { type: "rowheader:pointerdown"; row: number; e: MouseEvent }
+  | { type: "rowheader:pointerover"; row: number; e: MouseEvent }
   | { type: "colheader:pointerdown"; col: number; e: MouseEvent }
+  | { type: "colheader:pointerover"; col: number; e: MouseEvent }
   | { type: "pointer:up"; e: PointerEvent | MouseEvent };
 
 /** Return true to stop further handling. */
@@ -303,6 +305,9 @@ export function Gridsheet<T>(props: GridsheetProps<T>): JSX.Element {
                 onMouseDown={(col, e) =>
                   emit({ type: "colheader:pointerdown", col, e })
                 }
+                onMouseOver={(col, e) =>
+                  emit({ type: "colheader:pointerover", col, e })
+                }
                 class={props.classes?.colHeader}
               />
             )}
@@ -326,6 +331,9 @@ export function Gridsheet<T>(props: GridsheetProps<T>): JSX.Element {
                 isSelected={isRowHeaderSelected(rowIndex())}
                 onMouseDown={(r, e) =>
                   emit({ type: "rowheader:pointerdown", row: r, e })
+                }
+                onMouseOver={(r, e) =>
+                  emit({ type: "rowheader:pointerover", row: r, e })
                 }
                 class={props.classes?.rowHeader}
               />
@@ -380,6 +388,7 @@ interface RowHeaderProps {
   index: number;
   isSelected: boolean;
   onMouseDown: (rowIndex: number, e: MouseEvent) => void;
+  onMouseOver: (rowIndex: number, e: MouseEvent) => void;
   class?: string | ((ctx: { rowIndex: number; isSelected: boolean }) => string);
 }
 
@@ -389,9 +398,11 @@ function getRowLabel(rowIndex: number): string {
 
 function RowHeader(props: RowHeaderProps) {
   return (
+    // biome-ignore lint/a11y/useKeyWithMouseEvents: header drag selection is mouse-only
     <th
       data-slot="gridsheet-rowheader"
       onMouseDown={(e) => props.onMouseDown(props.index, e)}
+      onMouseOver={(e) => props.onMouseOver(props.index, e)}
       class={
         typeof props.class === "function"
           ? props.class({ rowIndex: props.index, isSelected: props.isSelected })
@@ -408,6 +419,7 @@ interface ColHeaderProps {
   index: number;
   isSelected: boolean;
   onMouseDown: (colIndex: number, e: MouseEvent) => void;
+  onMouseOver: (colIndex: number, e: MouseEvent) => void;
   class?: string | ((ctx: { colIndex: number; isSelected: boolean }) => string);
 }
 
@@ -425,9 +437,11 @@ function getColLabel(colIndex: number): string {
 
 function ColHeader(props: ColHeaderProps) {
   return (
+    // biome-ignore lint/a11y/useKeyWithMouseEvents: header drag selection is mouse-only
     <th
       data-slot="gridsheet-colheader"
       onMouseDown={(e) => props.onMouseDown(props.index, e)}
+      onMouseOver={(e) => props.onMouseOver(props.index, e)}
       class={
         typeof props.class === "function"
           ? props.class({ colIndex: props.index, isSelected: props.isSelected })

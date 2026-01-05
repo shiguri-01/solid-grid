@@ -22,7 +22,27 @@ export function selectionPlugin<T>(): GridPlugin<T> {
   let anchor: CellPosition | null = null;
   let head: CellPosition | null = null;
   let dragging = false;
+  let headerMode: "row" | "col" | null = null;
+  let previousBodyUserSelect: string | null = null;
 
+  const disableTextSelectionDuringDrag = () => {
+    if (typeof document === "undefined" || previousBodyUserSelect !== null)
+      return;
+    const body = document.body;
+    if (!body) return;
+    previousBodyUserSelect = body.style.userSelect;
+    body.style.userSelect = "none";
+  };
+
+  const restoreTextSelectionAfterDrag = () => {
+    if (typeof document === "undefined" || previousBodyUserSelect === null)
+      return;
+    const body = document.body;
+    if (body) {
+      body.style.userSelect = previousBodyUserSelect;
+    }
+    previousBodyUserSelect = null;
+  };
   const setSingle = (pos: CellPosition, api: GridApi<T>) => {
     anchor = pos;
     head = pos;
@@ -54,6 +74,8 @@ export function selectionPlugin<T>(): GridPlugin<T> {
 
           ev.e.preventDefault();
           dragging = true;
+          headerMode = null;
+          disableTextSelectionDuringDrag();
 
           setSingle(ev.pos, api);
           return true;
@@ -74,6 +96,8 @@ export function selectionPlugin<T>(): GridPlugin<T> {
 
         case "pointer:up": {
           if (dragging) dragging = false;
+          headerMode = null;
+          restoreTextSelectionAfterDrag();
           return;
         }
 
@@ -99,6 +123,8 @@ export function selectionPlugin<T>(): GridPlugin<T> {
           const min = { row: ev.row, col: 0 };
           const max = { row: ev.row, col: cols - 1 };
           dragging = false;
+          headerMode = "row";
+          disableTextSelectionDuringDrag();
           anchor = min;
           head = max;
           batch(() => {
@@ -108,18 +134,46 @@ export function selectionPlugin<T>(): GridPlugin<T> {
           return true;
         }
 
+        case "rowheader:pointerover": {
+          if (headerMode !== "row") return;
+          if ((ev.e.buttons & 1) === 0) return;
+          const cols = api.numCols();
+          if (cols <= 0) return true;
+          const startRow = anchor?.row ?? ev.row;
+          const min = { row: Math.min(startRow, ev.row), col: 0 };
+          const max = { row: Math.max(startRow, ev.row), col: cols - 1 };
+          head = max;
+          api.setSelection(normalizeRange(min, max));
+          return true;
+        }
+
         case "colheader:pointerdown": {
           const rows = api.numRows();
           if (rows <= 0) return true;
           const min = { row: 0, col: ev.col };
           const max = { row: rows - 1, col: ev.col };
           dragging = false;
+          headerMode = "col";
+          disableTextSelectionDuringDrag();
           anchor = min;
           head = max;
           batch(() => {
             api.setActiveCell(min);
             api.setSelection(normalizeRange(min, max));
           });
+          return true;
+        }
+
+        case "colheader:pointerover": {
+          if (headerMode !== "col") return;
+          if ((ev.e.buttons & 1) === 0) return;
+          const rows = api.numRows();
+          if (rows <= 0) return true;
+          const startCol = anchor?.col ?? ev.col;
+          const min = { row: 0, col: Math.min(startCol, ev.col) };
+          const max = { row: rows - 1, col: Math.max(startCol, ev.col) };
+          head = max;
+          api.setSelection(normalizeRange(min, max));
           return true;
         }
 
