@@ -1,20 +1,48 @@
 {
-  "name": "solid-grid",
+  "name": "@shiguri/solid-grid",
+  "version": "0.0.1",
+  "private": false,
+  "author": {
+    "name": "shiguri",
+    "url": "https://github.com/shiguri-01"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shiguri-01/solid-grid.git"
+  },
+  "homepage": "https://github.com/shiguri-01/solid-grid",
+  "keywords": [
+    "solidjs"
+  ],
+  "license": "MIT",
   "type": "module",
-  "private": true,
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "prepare": "lefthook install",
     "lint": "biome lint --write",
-    "fmt": "biome format --write"
+    "fmt": "biome format --write",
+    "build": "tsdown"
   },
-  "workspaces": [
-    "packages/*",
-    "examples/*"
-  ],
+  "peerDependencies": {
+    "solid-js": "^1.9.0"
+  },
   "devDependencies": {
     "@biomejs/biome": "2.3.4",
     "@types/bun": "latest",
     "lefthook": "^2.0.2",
+    "rolldown-plugin-solid": "^0.2.1",
+    "tsdown": "^0.16.1",
     "typescript": "^5.9.3"
   }
 }
