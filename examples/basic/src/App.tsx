@@ -10,6 +10,8 @@ import {
 import { createEffect, createSignal } from "solid-js";
 import "./App.css";
 
+// Minimal helper to apply grid patches to a 2D array.
+// In real apps, replace this with your preferred state management.
 function applyPatches<T>(data: T[][], patches: CellPatch<T>[]): T[][] {
   const next = data.map((row) => row.slice());
   for (const { pos, value } of patches) {
@@ -19,6 +21,61 @@ function applyPatches<T>(data: T[][], patches: CellPatch<T>[]): T[][] {
     row[pos.col] = value;
   }
   return next;
+}
+
+function CellRenderer(ctx: CellRenderContext<string>) {
+  const [draft, setDraft] = createSignal(ctx.value);
+
+  let inputRef: HTMLInputElement | undefined;
+  createEffect(() => {
+    if (!inputRef) return;
+    if (ctx.isEditing) {
+      inputRef.select();
+      inputRef.focus();
+    }
+  });
+
+  const handleCommit = () => {
+    ctx.commitEdit(draft());
+
+    // Refocus the cell after commit, once any re-render settles.
+    queueMicrotask(() => ctx.cellRef?.focus());
+  };
+
+  const handleCancel = () => {
+    setDraft(ctx.value);
+    ctx.cancelEditing();
+    queueMicrotask(() => ctx.cellRef?.focus());
+  };
+
+  if (ctx.isEditing) {
+    return (
+      <input
+        ref={inputRef}
+        type="text"
+        value={draft()}
+        onInput={(e) => setDraft(e.currentTarget.value)}
+        onKeyDown={(e) => {
+          if (e.isComposing) return;
+          if (e.key === "Enter") {
+            e.preventDefault();
+            e.stopPropagation();
+            handleCommit();
+          } else if (e.key === "Escape") {
+            e.preventDefault();
+            e.stopPropagation();
+            handleCancel();
+          }
+        }}
+        onBlur={handleCommit}
+        size={1}
+      />
+    );
+  }
+  return (
+    // Let the cell element handle dblclick/selection; avoid child span swallowing events.
+    <span style={{ "pointer-events": "none" }}>{ctx.value}</span>
+  );
 }
 
 function App() {
@@ -37,7 +94,7 @@ function App() {
   ]);
 
   return (
-    <div>
+    <>
       <h1>Solid Grid - Basic Example</h1>
       <Gridsheet
         data={data()}
@@ -47,45 +104,8 @@ function App() {
         renderCell={CellRenderer}
         onEvent={plugins.onEvent}
       />
-    </div>
+    </>
   );
-}
-
-function CellRenderer(ctx: CellRenderContext<string>) {
-  let inputRef: HTMLInputElement | undefined;
-  createEffect(() => {
-    if (!inputRef) return;
-    if (ctx.isEditing) {
-      inputRef.select();
-      inputRef.focus();
-    }
-  });
-
-  if (ctx.isEditing) {
-    return (
-      <input
-        ref={inputRef}
-        type="text"
-        value={ctx.value}
-        onKeyDown={(e) => {
-          if (e.isComposing) return;
-          if (e.key === "Enter") {
-            e.preventDefault();
-            e.stopPropagation();
-            ctx.commitEdit(inputRef?.value ?? ctx.value);
-            ctx.cellRef?.focus();
-          } else if (e.key === "Escape") {
-            e.preventDefault();
-            e.stopPropagation();
-            ctx.cancelEditing();
-            ctx.cellRef?.focus();
-          }
-        }}
-        style={{ width: "100%", "box-sizing": "border-box" }}
-      />
-    );
-  }
-  return <span>{ctx.value}</span>;
 }
 
 export default App;
