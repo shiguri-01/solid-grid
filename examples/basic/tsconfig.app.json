@@ -23,7 +23,7 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
     "paths": {
-      "@shiguri/solid-grid": ["../../packages/solid-grid/src/"]
+      "@shiguri/solid-grid": ["../../src/"]
     }
   },
   "include": ["src"]
