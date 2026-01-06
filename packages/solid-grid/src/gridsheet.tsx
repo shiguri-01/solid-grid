@@ -91,6 +91,14 @@ export interface GridsheetProps<T> {
   onCellsChange?: (patches: CellPatch<T>[]) => void;
 
   renderCell: (ctx: CellRenderContext<T>) => JSX.Element;
+  renderRowHeader?: (ctx: {
+    index: number;
+    isSelected: boolean;
+  }) => JSX.Element;
+  renderColHeader?: (ctx: {
+    index: number;
+    isSelected: boolean;
+  }) => JSX.Element;
 
   activeCell?: CellPosition | null;
   onActiveCellChange?: (pos: CellPosition | null) => void;
@@ -251,6 +259,9 @@ export function Gridsheet<T>(props: GridsheetProps<T>): JSX.Element {
     return sel !== null && colIndex >= sel.min.col && colIndex <= sel.max.col;
   };
 
+  const renderRowHeader = props.renderRowHeader ?? defaultRenderRowHeader;
+  const renderColHeader = props.renderColHeader ?? defaultRenderColHeader;
+
   const isCellEditing = (pos: CellPosition) =>
     api.isEditing() && isCellActive(pos);
 
@@ -309,6 +320,7 @@ export function Gridsheet<T>(props: GridsheetProps<T>): JSX.Element {
                   emit({ type: "colheader:pointerover", col, e })
                 }
                 class={props.classes?.colHeader}
+                renderHeader={renderColHeader}
               />
             )}
           </Index>
@@ -336,6 +348,7 @@ export function Gridsheet<T>(props: GridsheetProps<T>): JSX.Element {
                   emit({ type: "rowheader:pointerover", row: r, e })
                 }
                 class={props.classes?.rowHeader}
+                renderHeader={renderRowHeader}
               />
 
               <For each={row}>
@@ -390,10 +403,15 @@ interface RowHeaderProps {
   onMouseDown: (rowIndex: number, e: MouseEvent) => void;
   onMouseOver: (rowIndex: number, e: MouseEvent) => void;
   class?: string | ((ctx: { rowIndex: number; isSelected: boolean }) => string);
+  renderHeader: (ctx: { index: number; isSelected: boolean }) => JSX.Element;
 }
 
 function getRowLabel(rowIndex: number): string {
   return `${rowIndex + 1}`;
+}
+
+function defaultRenderRowHeader(ctx: { index: number; isSelected: boolean }) {
+  return <>{getRowLabel(ctx.index)}</>;
 }
 
 function RowHeader(props: RowHeaderProps) {
@@ -410,7 +428,7 @@ function RowHeader(props: RowHeaderProps) {
       }
       data-selected={props.isSelected || undefined}
     >
-      {getRowLabel(props.index)}
+      {props.renderHeader({ index: props.index, isSelected: props.isSelected })}
     </th>
   );
 }
@@ -421,6 +439,7 @@ interface ColHeaderProps {
   onMouseDown: (colIndex: number, e: MouseEvent) => void;
   onMouseOver: (colIndex: number, e: MouseEvent) => void;
   class?: string | ((ctx: { colIndex: number; isSelected: boolean }) => string);
+  renderHeader: (ctx: { index: number; isSelected: boolean }) => JSX.Element;
 }
 
 const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -433,6 +452,10 @@ function getColLabel(colIndex: number): string {
     n = Math.floor((n - 1) / 26);
   }
   return label;
+}
+
+function defaultRenderColHeader(ctx: { index: number; isSelected: boolean }) {
+  return <>{getColLabel(ctx.index)}</>;
 }
 
 function ColHeader(props: ColHeaderProps) {
@@ -449,7 +472,7 @@ function ColHeader(props: ColHeaderProps) {
       }
       data-selected={props.isSelected || undefined}
     >
-      {getColLabel(props.index)}
+      {props.renderHeader({ index: props.index, isSelected: props.isSelected })}
     </th>
   );
 }

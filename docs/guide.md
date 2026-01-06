@@ -74,6 +74,7 @@ function App() {
 - `data: T[][]`
 - `onCellsChange?: (patches: CellPatch<T>[]) => void`
 - `renderCell: (ctx: CellRenderContext<T>) => JSX.Element`
+- `renderRowHeader? / renderColHeader?`
 - `activeCell? / onActiveCellChange?`
 - `selection? / onSelectionChange?`
 - `isEditing? / onIsEditingChange?`

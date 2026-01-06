@@ -74,6 +74,34 @@ Available class slots:
 - `header`
 - `body`
 
+## Custom header content
+
+Use `renderRowHeader` and `renderColHeader` to render custom header content
+while keeping selection styling hooks. Headers set `data-selected` when the row
+or column is part of the selection range, so you can target them directly in
+CSS.
+
+```tsx
+<Gridsheet
+  data={data()}
+  renderCell={(ctx) => <span>{ctx.value}</span>}
+  renderRowHeader={({ index, isSelected }) => (
+    <span class={isSelected ? "row-header--selected" : undefined}>
+      #{index + 1}
+    </span>
+  )}
+  renderColHeader={({ index }) => <span>Field {index + 1}</span>}
+/>
+```
+
+```css
+[data-slot="gridsheet-rowheader"][data-selected],
+[data-slot="gridsheet-colheader"][data-selected] {
+  background: #eaf2ff;
+  font-weight: 600;
+}
+```
+
 ## State data attributes
 
 Cells and headers set `data-selected`, `data-active`, and `data-editing`
