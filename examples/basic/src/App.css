@@ -48,9 +48,9 @@ table[data-slot="gridsheet"] {
   }
 
   td input {
-    width: stretch;
+    width: 100%;
     min-width: 0;
-    height: stretch;
+    height: 100%;
     box-sizing: border-box;
     border: none;
     outline: none;

@@ -25,6 +25,11 @@ function applyPatches<T>(data: T[][], patches: CellPatch<T>[]): T[][] {
 
 function CellRenderer(ctx: CellRenderContext<string>) {
   const [draft, setDraft] = createSignal(ctx.value);
+  createEffect(() => {
+    if (!ctx.isEditing) {
+      setDraft(ctx.value);
+    }
+  });
 
   let inputRef: HTMLInputElement | undefined;
   createEffect(() => {
