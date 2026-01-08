@@ -160,7 +160,27 @@ See `docs/recipes.md` for examples and patterns.
 
 See `docs/styling.md` for styling patterns and class hooks.
 
-## 9. FAQ
+## 9. Presets (Optional)
+
+Small helpers are available from the presets entry point for quick setup.
+
+```tsx
+import { gridsheetStyle, textCellRenderer } from "@shiguri/solid-grid/presets";
+
+<Gridsheet
+  class={gridsheetStyle}
+  renderCell={textCellRenderer}
+  // other props still required, same as usual (data, onCellsChange, plugins, etc.)
+/>;
+```
+
+- `textCellRenderer`: a basic text input cell editor (Enter to commit, Escape to cancel).
+- `gridsheetStyle`: a minimal Tailwind-style class string that targets the built-in
+  `data-slot` hooks and preset input slot.
+
+These are independent helpers: you can use either one without the other.
+
+## 10. FAQ
 
 **Q: Why doesn’t the grid update on edit?**  
 **A:** Provide `onCellsChange` and apply patches to your data.
