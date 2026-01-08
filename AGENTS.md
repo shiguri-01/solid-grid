@@ -28,4 +28,4 @@
 
 ## Security & Configuration Tips
 - This package targets SolidJS as a peer dependency; avoid bundling SolidJS in build output.
-- Keep `dist/` generated via `npm run build` and avoid manual edits.
+- Keep `dist/` generated via `bun run build` and avoid manual edits.
