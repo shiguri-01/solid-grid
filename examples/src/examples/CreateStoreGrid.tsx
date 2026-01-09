@@ -7,6 +7,7 @@ import {
 	selectionPlugin,
 } from "@shiguri/solid-grid";
 import { gridsheetStyle, textCellRenderer } from "@shiguri/solid-grid/presets";
+import { batch } from "solid-js";
 import { createStore } from "solid-js/store";
 
 const makeData = (rows: number, cols: number) =>
@@ -34,12 +35,10 @@ export default function CreateStoreGrid() {
 			class={gridsheetStyle}
 			renderCell={textCellRenderer}
 			onCellsChange={(patches) =>
-				setStore("data", (prev) => {
-					const next = prev.map((row) => row.slice());
+				batch(() => {
 					for (const { pos, value } of patches) {
-						next[pos.row][pos.col] = value;
+						setStore("data", pos.row, pos.col, value);
 					}
-					return next;
 				})
 			}
 			onEvent={plugins.onEvent}
