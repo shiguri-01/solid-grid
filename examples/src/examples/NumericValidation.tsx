@@ -60,9 +60,11 @@ function NumberCell(ctx: CellRenderContext<number>) {
 						if (e.isComposing) return;
 						if (e.key === "Enter") {
 							e.preventDefault();
+							e.stopPropagation();
 							commitIfValid();
 						} else if (e.key === "Escape") {
 							e.preventDefault();
+							e.stopPropagation();
 							cancel();
 						}
 					}}
