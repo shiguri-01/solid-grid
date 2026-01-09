@@ -1,0 +1,20 @@
+{
+	"root": false,
+	"$schema": "https://biomejs.dev/schemas/2.3.4/schema.json",
+	"extends": ["../biome.json"],
+	"linter": {
+		"rules": {
+			"nursery": {
+				"useSortedClasses": {
+					"level": "warn",
+					"fix": "safe"
+				}
+			}
+		}
+	},
+	"css": {
+		"parser": {
+			"tailwindDirectives": true
+		}
+	}
+}
