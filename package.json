@@ -25,7 +25,8 @@
     "./presets": {
       "import": "./dist/presets.js",
       "types": "./dist/presets.d.ts"
-    }
+    },
+    "./preset-tailwind.css": "./dist/preset-tailwind.css"
   },
   "files": [
     "dist"
@@ -34,7 +35,7 @@
     "prepare": "lefthook install",
     "lint": "biome lint --write",
     "fmt": "biome format --write",
-    "build": "tsdown"
+    "build": "tsdown && node -e \"require('fs').copyFileSync('src/preset-tailwind.css', 'dist/preset-tailwind.css')\""
   },
   "peerDependencies": {
     "solid-js": "^1.9.0"
