@@ -180,6 +180,14 @@ import { gridsheetStyle, textCellRenderer } from "@shiguri/solid-grid/presets";
 
 These are independent helpers: you can use either one without the other.
 
+If you are using Tailwind v4, import the preset CSS so Tailwind picks up the
+classes used by `gridsheetStyle`:
+
+```css
+@import "tailwindcss";
+@import "@shiguri/solid-grid/preset-tailwind.css";
+```
+
 ## 10. FAQ
 
 **Q: Why doesn’t the grid update on edit?**  
