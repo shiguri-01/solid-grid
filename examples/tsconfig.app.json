@@ -10,7 +10,8 @@
 		"baseUrl": ".",
 		"paths": {
 			"@shiguri/solid-grid": ["../src/index.tsx"],
-			"@shiguri/solid-grid/presets": ["../src/presets.tsx"]
+			"@shiguri/solid-grid/presets": ["../src/presets.tsx"],
+			"@shiguri/solid-grid/preset-tailwind.css": ["../src/preset-tailwind.css"]
 		},
 
 		/* Bundler mode */

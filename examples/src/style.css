@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "@shiguri/solid-grid/preset-tailwind.css";
 
 :root {
 	color-scheme: light;
