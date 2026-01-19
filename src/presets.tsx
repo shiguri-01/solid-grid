@@ -104,7 +104,7 @@ export const gridsheetStyle =
   "[&_[data-slot=gridsheet-cell][data-active]]:outline-(--sg-active) " +
   "[&_[data-slot=gridsheet-cell][data-active]]:-outline-offset-2 " +
   "[&_[data-slot=gridsheet-cell][data-editing]]:bg-(--sg-bg) " +
-  // textCellRebderer preset
+  // textCellRenderer preset
   "[&_[data-slot=gridsheet-preset-text-input]]:w-full " +
   "[&_[data-slot=gridsheet-preset-text-input]]:h-full " +
   "[&_[data-slot=gridsheet-preset-text-input]]:min-w-0 " +
