@@ -1,6 +1,6 @@
 {
   "name": "@shiguri/solid-grid",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "private": false,
   "author": {
     "name": "shiguri",
@@ -29,7 +29,9 @@
     "./preset-tailwind.css": "./dist/preset-tailwind.css"
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "prepare": "lefthook install",
