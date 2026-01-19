@@ -59,39 +59,52 @@ export function textCellRenderer(ctx: CellRenderContext<string>) {
 
 export const gridsheetStyle =
   "sg-spreadsheet border-collapse " +
-  "[--sg-border:1px_solid_#d1d5db] " +
-  "[--sg-bg:#ffffff] " +
-  "[--sg-header-bg:#f1f5f9] " +
-  "[--sg-header-selected-bg:#bfdbfe] " +
-  "[--sg-selected-bg:#dbeafe] " +
-  "[--sg-active:#2563eb] " +
-  "[--sg-cell-padding-x:0.75rem] " +
-  "[--sg-cell-padding-y:0.5rem] " +
-  "[--sg-cell-min-w:80px] " +
-  "[border:var(--sg-border)] " +
-  "[&_[data-slot=gridsheet-rowheader]]:[border:var(--sg-border)] " +
-  "[&_[data-slot=gridsheet-colheader]]:[border:var(--sg-border)] " +
-  "[&_[data-slot=gridsheet-corner]]:[border:var(--sg-border)] " +
-  "[&_[data-slot=gridsheet-cell]]:[border:var(--sg-border)] " +
+  "[--sg-border:var(--color-zinc-300)] " +
+  "[--sg-bg:var(--color-white)] " +
+  "[--sg-fg:var(--color-zinc-950)] " +
+  "[--sg-header-bg:var(--color-zinc-100)] " +
+  "[--sg-header-fg:var(--color-zinc-600)] " +
+  "[--sg-header-selected-bg:var(--color-blue-100)] " +
+  "[--sg-selected-bg:var(--color-blue-50)] " +
+  "[--sg-active:var(--color-blue-500)] " +
+  "[--sg-cell-padding-x:0.5rem] " +
+  "[--sg-cell-padding-y:0.25rem] " +
+  "border " +
+  "border-(--sg-border) " +
+  "bg-(--sg-bg) " +
+  "text-(--sg-fg) " +
+  "[&_[data-slot=gridsheet-rowheader]]:border " +
+  "[&_[data-slot=gridsheet-rowheader]]:border-(--sg-border) " +
+  "[&_[data-slot=gridsheet-colheader]]:border " +
+  "[&_[data-slot=gridsheet-colheader]]:border-(--sg-border) " +
+  "[&_[data-slot=gridsheet-corner]]:border " +
+  "[&_[data-slot=gridsheet-corner]]:border-(--sg-border) " +
+  "[&_[data-slot=gridsheet-cell]]:border " +
+  "[&_[data-slot=gridsheet-cell]]:border-(--sg-border) " +
   "[&_[data-slot=gridsheet-rowheader]]:bg-(--sg-header-bg) " +
   "[&_[data-slot=gridsheet-colheader]]:bg-(--sg-header-bg) " +
   "[&_[data-slot=gridsheet-corner]]:bg-(--sg-header-bg) " +
   "[&_[data-slot=gridsheet-rowheader]]:font-semibold " +
   "[&_[data-slot=gridsheet-colheader]]:font-semibold " +
-  "[&_[data-slot=gridsheet-rowheader]]:text-slate-700 " +
-  "[&_[data-slot=gridsheet-colheader]]:text-slate-700 " +
+  "[&_[data-slot=gridsheet-rowheader]]:text-(--sg-header-fg) " +
+  "[&_[data-slot=gridsheet-colheader]]:text-(--sg-header-fg) " +
   "[&_[data-slot=gridsheet-rowheader][data-selected]]:bg-(--sg-header-selected-bg) " +
   "[&_[data-slot=gridsheet-colheader][data-selected]]:bg-(--sg-header-selected-bg) " +
+  "[&_[data-slot=gridsheet-rowheader]]:px-(--sg-cell-padding-x) " +
+  "[&_[data-slot=gridsheet-rowheader]]:py-(--sg-cell-padding-y) " +
+  "[&_[data-slot=gridsheet-colheader]]:px-(--sg-cell-padding-x) " +
+  "[&_[data-slot=gridsheet-colheader]]:py-(--sg-cell-padding-y) " +
   "[&_[data-slot=gridsheet-cell]]:bg-(--sg-bg) " +
   "[&_[data-slot=gridsheet-cell]]:px-(--sg-cell-padding-x) " +
   "[&_[data-slot=gridsheet-cell]]:py-(--sg-cell-padding-y) " +
-  "[&_[data-slot=gridsheet-cell]]:min-w-(--sg-cell-min-w) " +
+  "[&_[data-slot=gridsheet-cell]]:min-w-20 " +
   "[&_[data-slot=gridsheet-cell][data-selected]]:bg-(--sg-selected-bg) " +
   "[&_[data-slot=gridsheet-cell][data-active]]:outline " +
   "[&_[data-slot=gridsheet-cell][data-active]]:outline-2 " +
   "[&_[data-slot=gridsheet-cell][data-active]]:outline-(--sg-active) " +
   "[&_[data-slot=gridsheet-cell][data-active]]:-outline-offset-2 " +
   "[&_[data-slot=gridsheet-cell][data-editing]]:bg-(--sg-bg) " +
+  // textCellRebderer preset
   "[&_[data-slot=gridsheet-preset-text-input]]:w-full " +
   "[&_[data-slot=gridsheet-preset-text-input]]:h-full " +
   "[&_[data-slot=gridsheet-preset-text-input]]:min-w-0 " +

@@ -10,10 +10,8 @@
 		"baseUrl": ".",
 		"paths": {
 			"@shiguri/solid-grid": ["../src/index.tsx"],
-			"@shiguri/solid-grid/presets": ["../src/presets.tsx"],
-			"@shiguri/solid-grid/preset-tailwind.css": ["../src/preset-tailwind.css"]
+			"@shiguri/solid-grid/presets": ["../src/presets.tsx"]
 		},
-
 		/* Bundler mode */
 		"moduleResolution": "bundler",
 		"allowImportingTsExtensions": true,
@@ -22,7 +20,6 @@
 		"noEmit": true,
 		"jsx": "preserve",
 		"jsxImportSource": "solid-js",
-
 		/* Linting */
 		"strict": true,
 		"noUnusedLocals": true,
