@@ -3,7 +3,7 @@
 A headless grid component for [SolidJS](https://docs.solidjs.com/).
 Designed for `T[][]` data with custom rendering.
 
-> [!CAUTION]
+> [!WARNING]
 > **Work in progress**: The API is still evolving and may include breaking changes.
 
 ## Installation
