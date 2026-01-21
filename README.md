@@ -6,6 +6,10 @@ Designed for `T[][]` data with custom rendering.
 > [!WARNING]
 > **Work in progress**: The API is still evolving and may include breaking changes.
 
+## Demo
+
+[solid-grid.vercel.app](https://solid-grid.vercel.app)
+
 ## Installation
 
 ```bash
