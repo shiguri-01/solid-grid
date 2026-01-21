@@ -1,8 +1,9 @@
 # solid-grid
 
-A headless, plugin-driven grid component for [SolidJS](https://www.solidjs.com/).
-Designed for **T[][]** data and custom rendering.
+A headless grid component for [SolidJS](https://docs.solidjs.com/).
+Designed for `T[][]` data with custom rendering.
 
+> [!CAUTION]
 > **Work in progress**: The API is still evolving and may include breaking changes.
 
 ## Installation
@@ -14,45 +15,52 @@ npm install @shiguri/solid-grid
 ## Usage
 
 ```tsx
-import { createSignal } from "solid-js";
 import {
   Gridsheet,
+  clipboardTextPlugin,
   createPluginHost,
+  deletePlugin,
   selectionPlugin,
   editingPlugin,
 } from "@shiguri/solid-grid";
+import { textCellRenderer } from "@shiguri/solid-grid/presets";
+import { createSignal } from "solid-js";
 
-const [data, setData] = createSignal([
-  ["A1", "B1"],
-  ["A2", "B2"],
-]);
+function App() {
+  const [data, setData] = createSignal([
+    ["A1", "B1"],
+    ["A2", "B2"],
+  ]);
 
-const plugins = createPluginHost([
-  selectionPlugin(),
-  editingPlugin({ triggerKeys: ["Enter"] }),
-]);
+  const plugins = createPluginHost<string>([
+    selectionPlugin(),
+    editingPlugin(),
+    deletePlugin({ emptyValue: "" }),
+    clipboardTextPlugin({ getData: () => data(), emptyValue: "" }),
+  ]);
 
-<Gridsheet
-  data={data()}
-  onCellsChange={(patches) =>
-    setData((prev) => {
-      const next = prev.map((row) => row.slice());
-      for (const { pos, value } of patches) {
-        next[pos.row][pos.col] = value;
+  return (
+    <Gridsheet
+      data={data()}
+      renderCell={textCellRenderer}
+      onCellsChange={(patches) =>
+        setData((prev) => {
+          const next = prev.map((row) => row.slice());
+          for (const { pos, value } of patches) {
+            next[pos.row][pos.col] = value;
+          }
+          return next;
+        })
       }
-      return next;
-    })
-  }
-  renderCell={(ctx) => <span>{ctx.value}</span>}
-  onEvent={plugins.onEvent}
-/>;
+      onEvent={plugins.onEvent}
+    />
+  );
+}
 ```
 
 ## Documentation
 
-- `docs/guide.md`
-- `docs/recipes.md`
-- `docs/styling.md`
+See the [docs/](./docs/) directory.
 
 ---
 
